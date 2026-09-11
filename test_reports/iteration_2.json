@@ -1,0 +1,39 @@
+{
+  "summary": "Iteration 2 testing of CampusCrave — WebSocket live push, Ratings, Analytics ratings, Daily slot reset, Reorder, plus regression on order create + status advance. Backend: 9/9 pytest cases passed in /app/backend/tests/test_iteration2_features.py: (a) Daily slot reset endpoint idempotent and slot invariants hold (booked<=capacity, remaining=capacity-booked); (b) POST /api/orders/{id}/rating returns 409 before COLLECTED, 200 after, fields rating & rating_comment persist (verified via GET), other student → 403; (c) GET /api/admin/analytics now includes avg_rating, rated_count, recent_feedback[]; (d) WebSocket at /api/ws?order_id=<id> — both internal ws://localhost:8001 AND public wss://kitchen-flow-78.preview.emergentagent.com successfully receive 3 push messages when kitchen advances PLACED→PREPARING→READY_FOR_PICKUP→COLLECTED; each message has {type:'status', order_id, status}; (e) regression: student place-order + kitchen advance-status still working. Frontend (Expo web preview, viewport 390x844): student login → menu → add item → checkout → 16 slots → Pay & Confirm → landed on /order/{id} with QR + token; live-badge showed 'LIVE' within 3s of tracker mount confirming WS handshake through the public wss ingress; tracker-reorder present; rating block hidden pre-COLLECTED; after kitchen advanced order to COLLECTED via API, the tracker auto-updated via WS (stepper flipped to all-green, banner 'Enjoy your meal! 🎉') without page reload; 5 stars (star-1..star-5), rating-comment input, submit-rating all present and functional; after submit 'Your Rating' block replaced input with filled stars; tracker-reorder navigated to /checkout with items pre-loaded; orders list showed 18 reorder-<id> buttons and 'You rated 4/5' pill for the rated order; list reorder-<id> also navigates to /checkout with cart populated. No red screens, no page errors. Only console warning from prior iter remains: 'shadow*' style props deprecated (react-native-web) — non-blocking cosmetic.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "react-native-web styles (carryover from iter1)", "issue": "Console warning 'shadow*' style props are deprecated. Use boxShadow. Non-blocking; still present across screens."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration2_features.py",
+    "/app/test_reports/pytest/iter2_results.xml",
+    "/app/backend/tests/backend_test.py"
+  ],
+  "action_items": [
+    "(Optional carryover) Replace deprecated shadow* style props with boxShadow to silence RN-Web warnings.",
+    "(Optional hardening) WebSocket receive-loop currently expects text frames — consider handling ping/pong at protocol level for long-lived connections in production; not a bug in the demo."
+  ],
+  "critical_code_review_comments": [
+    "server.py grew to ~750 lines with iter2 additions — approaching the 700-line guideline; consider splitting routes into modules (auth/menu/orders/kitchen/admin/realtime).",
+    "@app.on_event('startup'/'shutdown') is deprecated in current FastAPI — migrate to lifespan context manager (non-blocking).",
+    "ConnectionManager uses a plain dict of sets without a lock; fine for asyncio single-loop (no true concurrency issue), but disconnect on send failure calls self.disconnect while iterating list(...) — safe because we snapshot first. OK.",
+    "ensure_slots_current() resets booked=0 based on a meta doc — but a slot inserted at seed time also has a 'day' field; if capacity was changed mid-day and new day rolls over, capacity is preserved which is desired.",
+    "WebSocket endpoint accepts any order_id and any (or no) auth — clients can subscribe to another order's stream. Acceptable for a demo, but for production consider a signed order token or auth query param."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration2_features.py (new)",
+    "/app/test_reports/pytest/iter2_results.xml (generated)",
+    "/app/test_reports/iteration_2.json (new)"
+  ],
+  "success_rate": {"backend": "100% (9/9 iter2 features) — plus 24/24 from iter1 suite still applicable", "frontend": "100% for iter2 features: WS live badge, ratings full flow, reorder from tracker & from orders list, rated pill, regression place-order"},
+  "seed_data_creation": "During tests, 3–4 collected + rated orders were created for student@campus.edu (comment='TEST yum' / 'TEST feedback' / 'TEST auto: yum') to exercise ratings & analytics.recent_feedback. A few TEST_<uuid>@campus.edu student accounts were also registered for the 403 forbidden-cross-user test.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iter2 regression suite lives at /app/backend/tests/test_iteration2_features.py (uses pytest-asyncio + websockets). It hits both internal ws://localhost:8001/api/ws and the public wss ingress. The frontend live-badge relies on process.env.EXPO_PUBLIC_BACKEND_URL being an https:// URL (converted to wss://). Verified working with kitchen-flow-78 ingress. If a future iteration changes the WS path or protocol scheme detection (order/[id].tsx line 46-47: base.replace(/^http/, 'ws')), retest live-badge specifically.",
+  "rca_of_issue": "No bugs. All targeted iter2 features (WebSocket push, ratings guard/persistence/cross-user, analytics rating aggregates, daily slot reset invariants, tracker & list reorder, live badge) are functional end-to-end via both backend pytest and frontend Playwright validation."
+}

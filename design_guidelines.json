@@ -1,0 +1,174 @@
+{
+  "app_name": "CampusCrave",
+  "personality": "1 iOS-Native Clean",
+  "personality_one_liner": "A fast, appetizing, and highly utilitarian digital canteen ecosystem that balances mouth-watering consumer UI with high-stress operational clarity.",
+  "color": {
+    "surface": "#FDFBF7",
+    "onSurface": "#1C1917",
+    "surfaceSecondary": "#FFFFFF",
+    "onSurfaceSecondary": "#1C1917",
+    "surfaceTertiary": "#F2EFEA",
+    "onSurfaceTertiary": "#44403C",
+    "surfaceInverse": "#1C1917",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#E04F26",
+    "onBrand": "#FFFFFF",
+    "brandPrimary": "#E04F26",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#F4A261",
+    "onBrandSecondary": "#1C1917",
+    "brandTertiary": "#F9E4DE",
+    "onBrandTertiary": "#9A3415",
+    "success": "#2A9D8F",
+    "onSuccess": "#FFFFFF",
+    "warning": "#E9C46A",
+    "onWarning": "#1C1917",
+    "error": "#E63946",
+    "onError": "#FFFFFF",
+    "info": "#84A59D",
+    "onInfo": "#FFFFFF",
+    "border": "#E7E5E4",
+    "borderStrong": "#D6D3D1",
+    "divider": "#F5F5F4",
+    "muted": "#78716C"
+  },
+  "typography": {
+    "displayFontFamily": "Plus Jakarta Sans",
+    "textFontFamily": "Plus Jakarta Sans",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous iOS-native rhythms. Content must never feel cramped. Use safe-area clearance at root. Ensure 44x44pt minimum touch targets.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "Use on sticky headers over scrolling menus.",
+      "Use on the floating 'View Cart' sticky button container.",
+      "Use on bottom sheet drag handles and modal scrims."
+    ],
+    "dont's": [
+      "Never use on dense Kitchen (KDS) or Admin data screens where clarity beats aesthetic.",
+      "Never use on standard menu item cards."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "haptics": {
+    "add_to_cart": "light",
+    "status_advance_kitchen": "medium",
+    "slot_selection": "selection",
+    "payment_success": "success",
+    "out_of_stock_toggle": "rigid"
+  },
+  "screens": [
+    {
+      "name": "StudentMenu",
+      "purpose": "Appetizing, fast discovery of food items with real-time stock and dynamic filtering.",
+      "states": {
+        "loading": "Centered spinner with 'Warming up the ovens...'",
+        "empty": "Empty plate illustration, 'No items match your filter.', 'Clear Filters' CTA.",
+        "error": "Readable message, 'Retry' CTA."
+      },
+      "layout": "Sticky header with greeting and search bar (glassmorphism on scroll). Below header: scrollable horizontal chip row for categories (Meals, Snacks, Beverages) and dietary toggles. Main content: 2-column grid of food cards (image with top->bottom gradient scrim, title, price, 'Add' button or 'Out of Stock' badge). Floating sticky 'View Cart' button (glass or solid surfaceInverse) at the bottom if items are in cart."
+    },
+    {
+      "name": "StudentCheckout",
+      "purpose": "Review items, pick a time slot, and simulate payment.",
+      "states": {
+        "loading": "Skeleton of cart items.",
+        "empty": "Empty plate illustration, 'Your tray is empty.', 'Browse Menu' CTA.",
+        "error": "Readable error, 'Retry' CTA."
+      },
+      "layout": "Single-column scroll. Section 1: Cart items list (thumbnail, name, qty controls). Section 2: Time Slot Picker (single-day view, horizontally scrolling pills grouped by Morning/Afternoon, visually distinct/strikethrough for full slots). Section 3: Payment method selectable cards. Sticky 'Pay & Confirm' CTA pinned at bottom above safe area."
+    },
+    {
+      "name": "StudentTracker",
+      "purpose": "Live visual progress of order and QR code for pickup.",
+      "states": {
+        "loading": "Fetching live order status...",
+        "empty": "N/A",
+        "error": "Failed to load order, 'Refresh' CTA."
+      },
+      "layout": "Large hero card at the top (surfaceSecondary) containing the unique Pickup Token ID and the QR Code. Below, a vertical progress stepper (Placed -> Preparing -> Ready -> Collected). Live wait time / capacity indicator prominently displayed."
+    },
+    {
+      "name": "KitchenDisplaySystem",
+      "purpose": "High-visibility, low-friction Kanban board for Kitchen Staff to manage orders.",
+      "states": {
+        "loading": "Loading active tickets...",
+        "empty": "Illustration of clean kitchen, 'All caught up! Queue is clear.', no CTA.",
+        "error": "Offline banner indicating WebSocket/network failure."
+      },
+      "layout": "Landscape-optimized. Left side: 'Batch Aggregator' sticky panel (e.g., '8x Burgers, 3x Fries'). Main area: Stackable ticket grid sorted by time slot. Tickets use large typography (readable from arm's length). 1-click status advance buttons (no confirmation modals—use 3s undo window). Quick '86 (Out of Stock)' toggle on menu items."
+    },
+    {
+      "name": "AdminDashboard",
+      "purpose": "Manage menu catalog, throttle slot limits, and view analytics.",
+      "states": {
+        "loading": "Loading metrics...",
+        "empty": "N/A",
+        "error": "Failed to load analytics, 'Retry' CTA."
+      },
+      "layout": "iOS-style grouped lists for settings. Segmented control to toggle between 'Live Ops' (throttle slot capacity) and 'Analytics' (bar charts for daily revenue, peak intervals, top sellers). Menu CRUD uses list items leading to form sheets."
+    }
+  ],
+  "images": {
+    "hero_banner": {
+      "url": "https://images.unsplash.com/photo-1559560329-e4b17eb5726b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwY2FtcHVzJTIwY2FmZXRlcmlhJTIwZm9vZHxlbnwwfHx8fDE3ODkxMzcyMDF8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "University campus cafeteria food"
+    },
+    "burger_snack": {
+      "url": "https://images.unsplash.com/photo-1572829329109-a738a0d21659?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwxfHxkZWxpY2lvdXMlMjBidXJnZXIlMjBhbmQlMjBmcmllcyUyMG9uJTIwdGFibGV8ZW58MHx8fHwxNzg5MTM3MjAxfDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Delicious burger and fries on table"
+    },
+    "iced_coffee": {
+      "url": "https://images.unsplash.com/photo-1592663527359-cf6642f54cff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxpY2VkJTIwY29mZmVlJTIwY2FmZXxlbnwwfHx8fDE3ODkxMzcyMDF8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Iced coffee in a cafe"
+    },
+    "empty_state": {
+      "url": "https://images.unsplash.com/photo-1567934124115-2eca8953796b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHwxfHxlbXB0eSUyMHBsYXRlJTIwb24lMjB0YWJsZSUyMG1pbmltYWx8ZW58MHx8fHwxNzg5MTM3MjAxfDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Minimal empty plate on a table"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette. ZERO blues/purples used anywhere. Terracotta/Rust (brandPrimary) is the dominant accent, mapped to primary actions.",
+    "Web search finding applied: Time Slot Picker MUST display a single-day view horizontally. Do not show an entire week to avoid cognitive overload. Apply strike-through or visually distinct disabled states for full capacity slots.",
+    "Web search finding applied: Kitchen Display System (KDS) must use oversized typography and large single-tap action buttons. Do NOT use confirmation modals for advancing order status; implement a 3-second 'Undo' snackbar instead to maximize kitchen throughput.",
+    "Ensure 'View Cart' and 'Pay' primary CTA buttons are fixed/sticky at the bottom of the screen (above safe area) while content scrolls behind them.",
+    "For cards with background images (e.g., Hero or featured menu items), implement the mandatory 3-stop top-to-bottom gradient scrim (transparent to surfaceInverse at ≥70% opacity) for guaranteed text readability.",
+    "Ensure the KDS UI functions horizontally/fluidly, prioritizing high density stackable ticket grids and a batch aggregator for items (e.g., counting total identical items needed across active orders)."
+  ]
+}
