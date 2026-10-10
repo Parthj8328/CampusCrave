@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -8,15 +8,15 @@ import { apiFetch } from "@/src/api/client";
 import { ScreenHeader } from "@/src/components/header";
 import { Badge, STATUS_META } from "@/src/components/ui";
 import { EmptyState } from "@/src/components/empty-state";
+import { AnimatedEntry } from "@/src/components/animated-entry";
 import { useToast } from "@/src/components/toast";
 import { useCart } from "@/src/store/cart";
 import { buildReorderLines } from "@/src/lib/reorder";
 import { haptic } from "@/src/lib/haptics";
-import { makeStyles, useTheme } from "@/src/theme";
+import { useTheme } from "@/src/theme";
 import type { MenuItem, Order } from "@/src/types";
 
 export default function StudentOrders() {
-  const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -50,11 +50,11 @@ export default function StudentOrders() {
   }
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: colors.deepObsidian }]}>
       <ScreenHeader title="My Orders" subtitle="Track your pickups live" />
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={colors.brandPrimary} />
+          <ActivityIndicator size="large" color={colors.saffronCoral} />
         </View>
       ) : !data || data.length === 0 ? (
         <View style={styles.center}>
@@ -69,52 +69,78 @@ export default function StudentOrders() {
         <FlatList
           data={data}
           keyExtractor={(o) => o.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24, gap: 12 }}
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: insets.bottom + 100,
+            gap: 14,
+          }}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const meta = STATUS_META[item.status];
             return (
-              <Pressable
-                testID={`order-card-${item.id}`}
+              <AnimatedEntry
+                index={index}
+                pressable
                 onPress={() => router.push(`/order/${item.id}` as any)}
-                style={styles.card}
+                testID={`order-card-${item.id}`}
               >
-                <View style={styles.cardTop}>
-                  <View>
-                    <Text style={styles.token}>{item.token}</Text>
-                    <Text style={styles.slot}>{item.slot_label}</Text>
-                  </View>
-                  <Badge label={meta.label} tone={meta.tone} testID={`order-status-${item.id}`} />
-                </View>
-                <View style={styles.cardBottom}>
-                  <Text style={styles.items} numberOfLines={1}>
-                    {item.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
-                  </Text>
-                  <View style={styles.right}>
-                    <Text style={styles.total}>₹{item.total}</Text>
-                    <Ionicons name="chevron-forward" size={18} color={colors.muted} />
-                  </View>
-                </View>
-                <View style={styles.actionRow}>
-                  {item.status === "COLLECTED" && item.rating ? (
-                    <View style={styles.ratedPill}>
-                      <Ionicons name="star" size={13} color={colors.warning} />
-                      <Text style={styles.ratedText}>You rated {item.rating}/5</Text>
+                <View style={styles.glassCard}>
+                  {/* Top Specular Rim Shine */}
+                  <View style={styles.cardTopShine} />
+
+                  <View style={styles.cardTop}>
+                    <View style={{ gap: 2 }}>
+                      <Text style={[styles.token, { color: colors.saffronCoral }]}>
+                        {item.token}
+                      </Text>
+                      <View style={styles.slotRow}>
+                        <Ionicons name="time-outline" size={13} color={colors.warmGold} />
+                        <Text style={[styles.slot, { color: colors.warmGold }]}>
+                          {item.slot_label}
+                        </Text>
+                      </View>
                     </View>
-                  ) : (
-                    <View />
-                  )}
-                  <Pressable
-                    testID={`reorder-${item.id}`}
-                    onPress={() => reorder(item)}
-                    style={styles.reorderBtn}
-                    hitSlop={6}
-                  >
-                    <Ionicons name="repeat" size={16} color={colors.onBrandPrimary} />
-                    <Text style={styles.reorderText}>Reorder</Text>
-                  </Pressable>
+                    <Badge label={meta.label} tone={meta.tone} testID={`order-status-${item.id}`} />
+                  </View>
+
+                  <View style={styles.cardBottom}>
+                    <Text style={[styles.items, { color: colors.mutedSilver }]} numberOfLines={1}>
+                      {item.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
+                    </Text>
+                    <View style={styles.right}>
+                      <Text style={[styles.total, { color: colors.softChalk }]}>
+                        ₹{item.total}
+                      </Text>
+                      <Ionicons name="chevron-forward" size={18} color={colors.mutedSilver} />
+                    </View>
+                  </View>
+
+                  <View style={styles.actionRow}>
+                    {item.status === "COLLECTED" && item.rating ? (
+                      <View style={styles.ratedPill}>
+                        <Ionicons name="star" size={13} color={colors.warmGold} />
+                        <Text style={[styles.ratedText, { color: colors.mutedSilver }]}>
+                          You rated {item.rating}/5
+                        </Text>
+                      </View>
+                    ) : (
+                      <View />
+                    )}
+                    <Pressable
+                      testID={`reorder-${item.id}`}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        reorder(item);
+                      }}
+                      style={styles.reorderBtn}
+                      hitSlop={6}
+                    >
+                      <Ionicons name="repeat" size={15} color="#FFFFFF" />
+                      <Text style={styles.reorderText}>Reorder</Text>
+                    </Pressable>
+                  </View>
                 </View>
-              </Pressable>
+              </AnimatedEntry>
             );
           }}
         />
@@ -123,42 +149,112 @@ export default function StudentOrders() {
   );
 }
 
-const useStyles = makeStyles((colors) => ({
-  root: { flex: 1, backgroundColor: colors.surface },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  card: {
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 16,
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  glassCard: {
+    backgroundColor: "rgba(28, 28, 34, 0.78)",
+    borderRadius: 20,
     padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.2,
+    borderColor: "rgba(255, 255, 255, 0.12)",
+    gap: 12,
+    position: "relative",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  cardTopShine: {
+    position: "absolute",
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 1.5,
+    backgroundColor: "rgba(255, 255, 255, 0.35)",
+  },
+  cardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  token: {
+    fontSize: 17,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+  },
+  slotRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 2,
+  },
+  slot: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  cardBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     gap: 12,
   },
-  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-  token: { fontSize: 16, fontWeight: "800", color: colors.brandPrimary },
-  slot: { fontSize: 13, color: colors.muted, marginTop: 2 },
-  cardBottom: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 },
-  items: { flex: 1, fontSize: 13, color: colors.onSurfaceTertiary },
-  right: { flexDirection: "row", alignItems: "center", gap: 4 },
-  total: { fontSize: 16, fontWeight: "800", color: colors.onSurface },
+  items: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  right: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  total: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: colors.divider,
+    borderTopColor: "rgba(255, 255, 255, 0.08)",
     paddingTop: 12,
   },
-  ratedPill: { flexDirection: "row", alignItems: "center", gap: 4 },
-  ratedText: { fontSize: 12, fontWeight: "700", color: colors.onSurfaceTertiary },
+  ratedPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  ratedText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
   reorderBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: colors.brandPrimary,
+    backgroundColor: "#FF6B4A",
     paddingHorizontal: 14,
-    height: 38,
-    borderRadius: 10,
+    height: 36,
+    borderRadius: 12,
+    shadowColor: "#FF6B4A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
   },
-  reorderText: { color: colors.onBrandPrimary, fontSize: 14, fontWeight: "800" },
-}));
+  reorderText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "800",
+  },
+});

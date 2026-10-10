@@ -22,15 +22,35 @@ export default function RootLayout() {
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <ToastProvider>
-                <StatusBar style="dark" />
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="login" />
-                  <Stack.Screen name="(student)" />
-                  <Stack.Screen name="(kitchen)" />
-                  <Stack.Screen name="(admin)" />
-                  <Stack.Screen name="checkout" options={{ presentation: "card" }} />
-                  <Stack.Screen name="order/[id]" options={{ presentation: "card" }} />
+                <StatusBar style="light" />
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: "fade",
+                    animationDuration: 220,
+                  }}
+                >
+                  <Stack.Screen name="index" options={{ animation: "fade" }} />
+                  <Stack.Screen name="login" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(student)" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(kitchen)" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(admin)" options={{ animation: "fade" }} />
+                  <Stack.Screen
+                    name="checkout"
+                    options={{
+                      presentation: "modal",
+                      animation: "slide_from_bottom",
+                      animationDuration: 280,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="order/[id]"
+                    options={{
+                      presentation: "card",
+                      animation: "slide_from_right",
+                      animationDuration: 260,
+                    }}
+                  />
                 </Stack>
               </ToastProvider>
             </AuthProvider>

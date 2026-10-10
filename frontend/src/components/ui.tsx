@@ -1,6 +1,8 @@
-import { ActivityIndicator, Pressable, Text, View, type ViewStyle } from "react-native";
+import { useRef } from "react";
+import { ActivityIndicator, Animated, Pressable, Text, View, type ViewStyle } from "react-native";
 import Ionicons from "@react-native-vector-icons/ionicons";
 
+import { haptic } from "@/src/lib/haptics";
 import { makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import type { Dietary, OrderStatus, SlotStatus } from "@/src/types";
 
@@ -31,6 +33,7 @@ export function Button({
 }: ButtonProps) {
   const styles = useStyles();
   const { colors } = useTheme();
+  const pressScale = useRef(new Animated.Value(1)).current;
 
   const bg =
     variant === "primary"
@@ -47,31 +50,55 @@ export function Button({
         ? colors.onError
         : colors.onSurface;
 
+  const handlePressIn = () => {
+    Animated.spring(pressScale, {
+      toValue: 0.965,
+      speed: 35,
+      bounciness: 0,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(pressScale, {
+      toValue: 1,
+      speed: 25,
+      bounciness: 6,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <Pressable
-      testID={testID}
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={({ pressed }) => [
-        styles.btn,
-        size === "lg" && styles.btnLg,
-        { backgroundColor: bg },
-        variant === "ghost" && styles.ghost,
-        fullWidth && { alignSelf: "stretch" },
-        (disabled || loading) && styles.disabled,
-        pressed && styles.pressed,
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator color={fg} />
-      ) : (
-        <View style={styles.btnInner}>
-          {icon ? <Ionicons name={icon as any} size={size === "lg" ? 20 : 18} color={fg} /> : null}
-          <Text style={[styles.btnText, size === "lg" && styles.btnTextLg, { color: fg }]}>{label}</Text>
-        </View>
-      )}
-    </Pressable>
+    <Animated.View style={[{ transform: [{ scale: pressScale }] }, fullWidth && { alignSelf: "stretch" }]}>
+      <Pressable
+        testID={testID}
+        onPress={() => {
+          haptic("light");
+          onPress();
+        }}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        style={[
+          styles.btn,
+          size === "lg" && styles.btnLg,
+          { backgroundColor: bg },
+          variant === "ghost" && styles.ghost,
+          fullWidth && { alignSelf: "stretch" },
+          (disabled || loading) && styles.disabled,
+          style,
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={fg} />
+        ) : (
+          <View style={styles.btnInner}>
+            {icon ? <Ionicons name={icon as any} size={size === "lg" ? 20 : 18} color={fg} /> : null}
+            <Text style={[styles.btnText, size === "lg" && styles.btnTextLg, { color: fg }]}>{label}</Text>
+          </View>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 }
 

@@ -674,6 +674,7 @@ DEMO_USERS = [
     {"email": "parthj8328@gmail.com", "name": "Parth Jadhav", "password": "password123", "role": "STUDENT"},
     {"email": "chavanritesh2207@gmail.com", "name": "Ritesh Chavan", "password": "password123", "role": "KITCHEN_STAFF"},
     {"email": "priticchavan2105@gmail.com", "name": "Priti Chavan", "password": "password123", "role": "ADMIN"},
+    {"email": "parthjadhav8328@gmail.com", "name": "Gautam Gambhir", "password": "password123", "role": "STUDENT"},
 ]
 
 

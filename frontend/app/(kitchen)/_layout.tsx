@@ -1,26 +1,16 @@
-import { Platform } from "react-native";
 import { Tabs } from "expo-router";
 import Ionicons from "@react-native-vector-icons/ionicons";
 
 import { RoleGate } from "@/src/auth/role-gate";
-import { useTheme } from "@/src/theme";
+import { FloatingGlassTabBar } from "@/src/components/floating-tab-bar";
 
 export default function KitchenLayout() {
-  const { colors } = useTheme();
   return (
     <RoleGate allow={["KITCHEN_STAFF"]}>
       <Tabs
+        tabBar={(props) => <FloatingGlassTabBar {...props} />}
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: colors.brandPrimary,
-          tabBarInactiveTintColor: colors.muted,
-          tabBarStyle: {
-            backgroundColor: colors.surfaceSecondary,
-            borderTopColor: colors.divider,
-            ...(Platform.OS === "web" ? { height: 64 } : {}),
-          },
-          tabBarItemStyle: { alignSelf: "center" },
-          tabBarLabelStyle: { fontSize: 11, fontWeight: "700" },
         }}
       >
         <Tabs.Screen
@@ -34,7 +24,7 @@ export default function KitchenLayout() {
           name="stock"
           options={{
             title: "Stock",
-            tabBarIcon: ({ color, size }) => <Ionicons name="toggle-outline" size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => <Ionicons name="layers-outline" size={size} color={color} />,
           }}
         />
         <Tabs.Screen
